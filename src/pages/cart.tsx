@@ -5,9 +5,15 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CartReducerInitialState } from "../types/reducer-types";
 import { CartItem } from "../types/types";
-import { addToCart, removeCartItem } from "../redux/reducer/cartReducer";
+import { addToCart, calculatePrice, discountApplied, removeCartItem } from "../redux/reducer/cartReducer";
+import axios from "axios";
+//import { server } from "../redux/store";
 
 const Cart = () => {
+
+  const server = "http://localhost:4000";
+
+  // getting cart Array from store
   const { cartItems, subtotal, tax, total, shippingCharges, discount } =
     useSelector(
       (state: { cartReducer: CartReducerInitialState }) => state.cartReducer
@@ -34,17 +40,36 @@ const Cart = () => {
   const removeHandler = (productId:string) => {
     dispatch(removeCartItem(productId));
   };
-  useEffect(() => {
-    const timeOutId = setTimeout(() => {
-      if (Math.random() > 0.5) setIsValidCouponCode(true);
-      else setIsValidCouponCode(false);
-    }, 1000);
+
+  // logic for coupon-validation
+  useEffect(()=>{
+
+    const {token:cancelToken,cancel} = axios.CancelToken.source();
+
+    const timeOutId = setTimeout(()=>{
+       axios.get(`${server}/api/v1/payment/discount?coupon=${couponCode}`,{cancelToken})
+       .then((res)=>{ 
+        dispatch(discountApplied(res.data.discount));
+        console.log(res.data);
+        setIsValidCouponCode(true);
+       }).catch(()=>{
+        dispatch(discountApplied(0));
+        cancel();
+        setIsValidCouponCode(false);
+       })
+    },1000);
 
     return () => {
       clearTimeout(timeOutId);
       setIsValidCouponCode(false);
-    };
-  }, [couponCode]);
+    }
+  },[couponCode])
+
+  // code for cart price total
+  useEffect(()=>{
+    dispatch(calculatePrice());
+  },[cartItems]);
+
 
   return (
     <div className="cart">

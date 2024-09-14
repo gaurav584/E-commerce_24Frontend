@@ -1,6 +1,6 @@
 import { FaTrash } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { server } from "../redux/store";
+//import { server } from "../redux/store";
 import { CartItem } from "../types/types";
 
 type CartItemsProps = {
@@ -16,6 +16,9 @@ const CartItem = ({
   decrementHandler,
   removeHandler,
 }: CartItemsProps) => {
+
+  const server = "https://e-commerce-24backend-6.onrender.com";
+  
   const { photo, productId, name, price, quantity } = cartItem;
   return (
     <div className="cart-item">

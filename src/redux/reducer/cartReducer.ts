@@ -45,14 +45,21 @@ export const cartReducer = createSlice({
         calculatePrice:(state) => {
           
             // logic for subtotal
-            const subtotal = 3434;
+            let subtotal = state.cartItems.reduce(
+                (total,item) => total + item.price*item.quantity,0
+            );
 
             state.subtotal=subtotal;
             state.shippingCharges=state.subtotal > 1000 ? 0 : 200;
             state.tax = Math.round(subtotal * 0.18);
             state.total=state.subtotal+state.tax+state.shippingCharges-state.discount;
-        }
+        },
+
+        discountApplied:(state,action:PayloadAction<number>) => {
+            state.discount = action.payload;
+        },
+        resetCart:() => initialState
     }
 });
 
-export const {addToCart,removeCartItem} = cartReducer.actions;
+export const {addToCart,removeCartItem , calculatePrice , discountApplied , resetCart} = cartReducer.actions;

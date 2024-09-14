@@ -5,17 +5,19 @@ import Header from "./components/header";
 import Shipping from "./pages/shipping";
 import Login from "./pages/login";
 import { Toaster } from "react-hot-toast";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./redux/api/userAPI";
 import { userExist, userNotExist } from "./redux/reducer/userReducer";
 import { UserReducerInitialState } from "./types/reducer-types";
 import ProtectedRoute from "./components/protected-route";
+import Orders from "./pages/orders";
 
 const Home = lazy(() => import("./pages/home"));
 const Search = lazy(() => import("./pages/search"));
 const Cart = lazy(() => import("./pages/cart"));
+const Checkout = lazy(() => import("./pages/checkout"));
 
 // admin routes importing
 const Dashboard = lazy(() => import("./pages/admin/dashboard"));
@@ -37,9 +39,12 @@ const TransactionManagement = lazy(
 );
 
 const App = () => {
+  
   const { user, loading } = useSelector(
     (state: { userReducer: UserReducerInitialState }) => state.userReducer
   );
+
+  //return signOut(auth).then((c)=> console.log("signout"))
 
   const dispatch = useDispatch();
 
@@ -67,12 +72,21 @@ const App = () => {
           <Route path="/search" element={<Search />} />
 
 
+          {/* Testing- Route */}
+          <Route path="/pay" element={<Checkout />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/shipping" element={<Shipping />} />
+          <Route path="/orders" element={<Orders/>}/>
+          
+
           {/* Logged in User Routes */}
           <Route
             element={<ProtectedRoute isAuthenticated={user ? true : false} />}
           >
-            <Route path="/shipping" element={<Shipping />} />
+            {/* <Route path="/shipping" element={<Shipping />} />
+            <Route path="/orders" element={<Orders/>}/>
             <Route path="/cart" element={<Cart />} />
+            <Route path="/pay" element={<Checkout />} /> */}
          {/*  <Route
               path="/login"
               element={

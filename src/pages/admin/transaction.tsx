@@ -1,8 +1,15 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Column } from "react-table";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import TableHOC from "../../components/admin/TableHOC";
+import { useSelector } from "react-redux";
+import { UserReducerInitialState } from "../../types/reducer-types";
+import { useAllOrdersQuery } from "../../redux/api/orderApi";
+import { CustomError } from "../../types/api-types";
+import toast from "react-hot-toast";
+import { Skeleton } from "../../components/loader";
+import { RootState } from "@reduxjs/toolkit/query";
 
 interface DataType {
   user: string;
@@ -13,33 +20,6 @@ interface DataType {
   action: ReactElement;
 }
 
-const arr: Array<DataType> = [
-  {
-    user: "Charas",
-    amount: 4500,
-    discount: 400,
-    status: <span className="red">Processing</span>,
-    quantity: 3,
-    action: <Link to="/admin/transaction/sajknaskd">Manage</Link>,
-  },
-
-  {
-    user: "Xavirors",
-    amount: 6999,
-    discount: 400,
-    status: <span className="green">Shipped</span>,
-    quantity: 6,
-    action: <Link to="/admin/transaction/sajknaskd">Manage</Link>,
-  },
-  {
-    user: "Xavirors",
-    amount: 6999,
-    discount: 400,
-    status: <span className="purple">Delivered</span>,
-    quantity: 6,
-    action: <Link to="/admin/transaction/sajknaskd">Manage</Link>,
-  },
-];
 
 const columns: Column<DataType>[] = [
   {
@@ -69,7 +49,49 @@ const columns: Column<DataType>[] = [
 ];
 
 const Transaction = () => {
-  const [rows, setRows] = useState<DataType[]>(arr);
+  // get user from redux-store
+  const { user } = useSelector(
+    (state: { state:RootState}) => state.userReducer
+  );
+
+  // calling-api using(RTK-Query hook)
+  const { isLoading, data, isError, error } = useAllOrdersQuery(user?._id!);
+
+  const [rows, setRows] = useState<DataType[]>([]);
+
+  // apply check after calling api data get or not properly
+  if (isError) {
+    const err = error as CustomError;
+    toast.error(err.data.message);
+  }
+
+  // setting data which are get from api call
+  useEffect(() => {
+    if (data) {
+      setRows(
+        data.orders.map((i) => ({
+          user: i.user.name,
+          amount: i.total,
+          discount: i.discount,
+          quantity: i.orderItems.length,
+          status: (
+            <span
+              className={
+                i.status === "Processing"
+                  ? "red"
+                  : i.status === "Shipped"
+                  ? "green"
+                  : "purple"
+              }
+            >
+              {i.status}
+            </span>
+          ), // If needed
+          action: <Link to={`/admin/transaction/${i._id}`}>Manage</Link>, // Use Link instead of link
+        }))
+      );
+    }
+  }, [data]);
 
   const Table = TableHOC<DataType>(
     columns,
@@ -81,7 +103,7 @@ const Transaction = () => {
   return (
     <div className="admin-container">
       <AdminSidebar />
-      <main>{Table}</main>
+      <main>{isLoading ? <Skeleton length={20}/> : Table}</main>
     </div>
   );
 };

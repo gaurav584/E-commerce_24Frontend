@@ -44,6 +44,7 @@ const columns: Column<DataType>[] = [
 ];
 
 const Products = () => {
+  // get-user from redux-store
   const { user } = useSelector(
     (state: { userReducer: UserReducerInitialState }) => state.userReducer
   );

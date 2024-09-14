@@ -43,7 +43,7 @@ $color3: rgba(0, 104, 136);
 @import "admin-styles/dashboard";
 @import "admin-styles/products.scss";
 @import "admin-styles/chart";
-@import "admin-styles/dashboard";
+@import "admin-styles/dashboardapp";
 @import "admin-styles/mediaquery";
 
 .header {
@@ -72,32 +72,22 @@ $color3: rgba(0, 104, 136);
   dialog {
     border: 1px solid #ccc;
   }
-   
 
 
+  .checkout-container{
+    max-width: 400px;
+    width: 100px;
+    margin:auto;
+       > form {
+        @include flex(coloumn,flex-start,strech,2rem);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        > button {
+          @include btn(1rem,$color3,$color1);
+          width: 100%;
+          font-size: 1.1rem
+        }
+       }
+  }
   
   .admin-container {
     @include grid(1fr 4fr, 2rem);
@@ -296,6 +286,50 @@ $color3: rgba(0, 104, 136);
     }
     100% {
       opacity: 0.6;
+    }
+  }
+}
+
+
+.checkout-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+
+
+  @media (max-width:768px){
+    padding: 10px;
+  }
+
+  .checkout-form{
+    width: 100%;
+    max-width: 400px;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+    border-radius: 10px; // Rounded corners
+    margin-bottom: 20px;
+  }
+
+  .payment_button {
+    background-color: #4CAF50; // Primary color for the button
+    color: white; // Text color
+    padding: 12px 20px;
+    padding-top: 20px; // Extra padding on top to create space
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px; // Additional space from the dropdown above
+  
+    &:hover {
+      background-color: #45a049; // Darker shade on hover
     }
   }
 }
